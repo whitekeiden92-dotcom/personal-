@@ -1,23 +1,16 @@
 import ProjectCard from './ProjectCard.jsx';
 
-function ProjectGrid({ projects, searchTerm }) {
+function ProjectGrid({ projects }) {
   return (
-    <section className="project-list" aria-labelledby="projects-title">
-      <div className="section-heading">
-        <p className="eyebrow">Portfolio</p>
-        <h2 id="projects-title">Project archive</h2>
-      </div>
-
+    <section className="project-list">
       {projects.length > 0 ? (
-        <div className="project-grid">
+        <div className="project-list-items">
           {projects.map((project) => (
             <ProjectCard key={project.id} project={project} />
           ))}
         </div>
       ) : (
-        <p className="empty-state">
-          No projects match "{searchTerm}". Try a different keyword.
-        </p>
+        <p className="empty-state">No projects found. Try another search term.</p>
       )}
     </section>
   );

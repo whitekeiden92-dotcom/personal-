@@ -1,67 +1,57 @@
-import { useMemo, useState } from 'react';
-import Header from './components/Header.jsx';
+import { useState } from 'react';
 import ProjectForm from './components/ProjectForm.jsx';
 import ProjectGrid from './components/ProjectGrid.jsx';
 import { initialProjects } from './data/projects.js';
+
+function createProjectId() {
+  return `${Date.now()}-${Math.floor(Math.random() * 100000)}`;
+}
 
 function App() {
   const [projects, setProjects] = useState(initialProjects);
   const [searchTerm, setSearchTerm] = useState('');
 
-  const filteredProjects = useMemo(() => {
+  const filteredProjects = projects.filter((project) => {
     const query = searchTerm.trim().toLowerCase();
+    if (!query) return true;
 
-    if (!query) {
-      return projects;
-    }
-
-    return projects.filter((project) => {
-      // Build one searchable string so users can filter by any visible project detail.
-      const searchableText = [
-        project.title,
-        project.category,
-        project.description,
-        project.client,
-        project.year,
-        ...project.tags,
-      ]
-        .join(' ')
-        .toLowerCase();
-
-      return searchableText.includes(query);
-    });
-  }, [projects, searchTerm]);
+    return [project.title, project.description]
+      .join(' ')
+      .toLowerCase()
+      .includes(query);
+  });
 
   function handleAddProject(project) {
     setProjects((currentProjects) => [
-      {
-        ...project,
-        id: crypto.randomUUID(),
-      },
+      { ...project, id: createProjectId() },
       ...currentProjects,
     ]);
   }
 
   return (
-    <main id="top">
-      <Header
-        projectCount={projects.length}
-        searchTerm={searchTerm}
-        onSearchChange={setSearchTerm}
-      />
+    <main>
+      <header className="app-header">
+        <h1>PROJECT TASK</h1>
+      </header>
 
-      <section className="workspace" aria-label="Portfolio workspace">
-        <ProjectForm onAddProject={handleAddProject} />
-        <ProjectGrid projects={filteredProjects} searchTerm={searchTerm} />
-      </section>
+      <div className="page-layout">
+        <section className="panel add-panel">
+          <h2>Add Project</h2>
+          <ProjectForm onAddProject={handleAddProject} />
+        </section>
 
-      <footer className="site-footer">
-        <p>
-          Studio Ledger is a responsive creative portfolio platform for brand,
-          digital, and product teams. Add new work, keep the archive current,
-          and make every case study feel polished.
-        </p>
-      </footer>
+        <section className="panel list-panel">
+          <input
+            className="search-input"
+            type="search"
+            placeholder="Search Projects"
+            value={searchTerm}
+            onChange={(event) => setSearchTerm(event.target.value)}
+          />
+
+          <ProjectGrid projects={filteredProjects} />
+        </section>
+      </div>
     </main>
   );
 }
